@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project 01: CLI Student Management System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        /* Print va PDF sahifalash qoidalari */
+        @page {
+            size: A4;
+            margin: 8mm 11mm 8mm 11mm;
+            @bottom-right {
+                content: "Sahifa " counter(page);
+                font-family: 'Inter', sans-serif;
+                font-size: 7.2pt;
+                color: #64748B;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #0F172A;
+            line-height: 1.34;
+            font-size: 8.4pt;
+            background-color: #F1F5F9;
+            padding: 16px 12px;
+        }
+
+        .page-container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 22px 30px;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+        }
+
+        /* Sahifani majburiy bo'lish */
+        .page-break {
+            page-break-before: always;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #CBD5E1;
+        }
+
+        /* Header */
+        .header {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-top: 3.5px solid #2563EB;
+            padding: 11px 15px;
+            border-radius: 6px;
+            margin-bottom: 9px;
+            page-break-inside: avoid;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: #EFF6FF;
+            color: #1D4ED8;
+            font-size: 7.2pt;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            border: 1px solid #BFDBFE;
+        }
+
+        .header h1 {
+            font-size: 13.5pt;
+            font-weight: 800;
+            color: #0F172A;
+            line-height: 1.2;
+            margin-bottom: 3px;
+        }
+
+        .header .subtitle {
+            font-size: 8.3pt;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 7.4pt;
+            color: #64748B;
+            border-top: 1px solid #F1F5F9;
+            padding-top: 5px;
+        }
+
+        .header-meta span strong {
+            color: #334155;
+        }
+
+        /* Sarlavhalar */
+        h2 {
+            font-size: 9.8pt;
+            font-weight: 700;
+            color: #1E293B;
+            margin-top: 8px;
+            margin-bottom: 5px;
+            padding-bottom: 2px;
+            border-bottom: 1.2px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 8.6pt;
+            font-weight: 700;
+            color: #334155;
+            margin-top: 6px;
+            margin-bottom: 3px;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin-bottom: 5px;
+            color: #334155;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 16px;
+            margin-bottom: 5px;
+            color: #334155;
+        }
+
+        li {
+            margin-bottom: 2px;
+        }
+
+        strong {
+            color: #0F172A;
+        }
+
+        /* Kartochkalar va bloklar */
+        .card {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 5px;
+            padding: 7px 10px;
+            margin-bottom: 6px;
+            page-break-inside: avoid;
+        }
+
+        .card-accent {
+            border-left: 3.5px solid #2563EB;
+            background: #FAF5FF;
+            border-color: #E9D5FF;
+        }
+
+        .card-emerald {
+            border-left: 3.5px solid #059669;
+            background: #F0FDF4;
+            border-color: #BBF7D0;
+        }
+
+        .card-amber {
+            border-left: 3.5px solid #D97706;
+            background: #FFFBEB;
+            border-color: #FDE68A;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 6px;
+            page-break-inside: avoid;
+        }
+
+        /* Kod bloklari */
+        pre {
+            background: #0F172A;
+            color: #F8FAFC;
+            padding: 6px 9px;
+            border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.0pt;
+            line-height: 1.28;
+            overflow-x: auto;
+            margin-bottom: 5px;
+            border: 1px solid #1E293B;
+            page-break-inside: avoid;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.5pt;
+            background: #F1F5F9;
+            color: #0F172A;
+            padding: 1px 3px;
+            border-radius: 3px;
+            border: 1px solid #E2E8F0;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            border: none;
+            font-size: 7.0pt;
+        }
+
+        .code-keyword { color: #F472B6; font-weight: bold; }
+        .code-func { color: #60A5FA; }
+        .code-string { color: #34D399; }
+        .code-comment { color: #94A3B8; font-style: italic; }
+        .code-num { color: #FBBF24; }
+
+        /* Jadvallar */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.3pt;
+            margin-bottom: 6px;
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 5px;
+            overflow: hidden;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            padding: 4px 6px;
+            border: 1px solid #E2E8F0;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #F8FAFC;
+            color: #1E293B;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        /* Diagramma bloki */
+        .diagram-box {
+            background: #0F172A;
+            color: #38BDF8;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 6.8pt;
+            line-height: 1.25;
+            padding: 7px 10px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            border: 1px solid #1E293B;
+            page-break-inside: avoid;
+            white-space: pre;
+        }
+
+        @media print {
+            body {
+                background-color: #FFFFFF;
+                padding: 0;
+            }
+            .page-container {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .page-break {
+                border-top: none;
+                margin-top: 0;
+                padding-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-container">
+
+    <!-- ==================== SAHIFA 1: KONSEPSIYA VA ARXITEKTURA ==================== -->
+    <div class="header">
+        <span class="badge">AI Journey • Modul 01 Yakuni • Portfolio Loyihasi 01</span>
+        <h1>CLI Student Management System (Talabalar Boshqaruv Tizimi)</h1>
+        <div class="subtitle">Python asoslari, OOP, JSON Persistence va CLI orqali to'liq ishlaydigan portfolioga loyiq konsol tizimi</div>
+        <div class="header-meta">
+            <span><strong>Status:</strong> Yakunlangan (Production Ready)</span>
+            <span><strong>Arxitektura:</strong> 4 Qatlamli Modulli Tizim</span>
+            <span><strong>Dasturlash tili:</strong> Pure Python 3.10+</span>
+            <span><strong>Muallif:</strong> @AijourneyShohzamon</span>
+        </div>
+    </div>
+
+    <h2>1. Loyihaning Maqsadi va Umumiy Konsepsiyasi</h2>
+    <p>
+        Dasturlash va Sun'iy intellekt (AI) muhandisligida muvaffaqiyatga erishish uchun faqat darslardagi alohida sintaksis mashqlarini bajarish yetarli emas. Haqiqiy dasturchi o'rganilgan barcha mavzularni — <em>o'zgaruvchilar, shartlar, sikllar, funksiyalar, ma'lumot tuzilmalari, fayllar, istisnolar (Exceptions) va OOP tamoyillarini</em> — bitta mustahkam, professional arxitekturada birlashtira olishi kerak.
+    </p>
+    <p>
+        <strong>CLI Student Management System</strong> — bu o'quv markazlari yoki universitetlar uchun talabalarni ro'yxatga olish, ularning imtihon ballarini hisoblash, guruh o'rtacha GPA ko'rsatkichini aniqlash, Top-5 a'lochilarni saralash va barcha ma'lumotlarni qattiq diskdagi JSON bazada xavfsiz saqlashni ta'minlovchi to'liq mustaqil konsol platformasidir.
+    </p>
+
+    <h2>2. Tizim Arxitekturasi (4 Qatlamli Tizim)</h2>
+    <p>
+        Loyiha professional dasturiy ta'minot standartlariga binoan <strong>Separation of Concerns</strong> (Vazifalarni qat'iy taqsimlash) qoidasiga asoslangan 4 qatlamdan iborat:
+    </p>
+
+    <div class="diagram-box">+-------------------------------------------------------------------------------+
+|                        1. PRESENTATION LAYER (main.py)                        |
+|  * Foydalanuvchi bilan interaktiv muloqot (Menu 1-9)                          |
+|  * Windows UTF-8 konsol konfiguratsiyasi (Charmap Crash oldini olish)         |
+|  * Jadval ko'rinishidagi ma'lumotlar vizualizatsiyasi                         |
++---------------------------------------+---------------------------------------+
+                                        |
+                                        v
++-------------------------------------------------------------------------------+
+|                    2. BUSINESS LOGIC / SERVICE LAYER (manager.py)             |
+|  * StudentManager: CRUD amallari (Qo'shish, Yangilash, O'chirish)             |
+|  * Substring Qidiruv & Top-5 Saralash (Higher-Order lambda & sorted)          |
+|  * Data Science Agregatsiyasi (sum, len, min, max, any, all ko'rsatkichlari)  |
++---------------------------------------+---------------------------------------+
+                                        |
+                   +--------------------+--------------------+
+                   |                                         |
+                   v                                         v
++------------------------------------+    +-------------------------------------+
+|      3. DATA MODEL (models.py)     |    |     4. STORAGE LAYER (storage.py)   |
+|  * Student klassi (OOP)            |    |  * StorageManager: JSON I/O         |
+|  * Maydonlar va Baholar validatsiyasi|  * Fault-Tolerance (Try/Except)       |
+|  * to_dict() va from_dict()        |    |  * UTF-8 fayl doimiyligi (Disk)     |
+|  * Dunder metodlar (__str__, __repr|    +------------------+------------------+
++------------------------------------+                       |
+                                                             v
+                                          +-------------------------------------+
+                                          | DATA STORE: data/students.json      |
+                                          +-------------------------------------+</div>
+
+    <h2>3. Loyiha Papkalar Strukturasi va Rol Taqsimoti</h2>
+    <div class="card">
+        <p><strong>Separation of Concerns (Mas'uliyatlar taqsimoti):</strong> Loyiha kodlari bitta katta faylga yozilmasdan, 4 ta mustaqil modulga ajratilgan. Bu kodni o'qish, testlash va kelajakda kengaytirishni osonlashtiradi:</p>
+        <ul style="margin-top: 3px;">
+            <li><code>src/models.py</code> — Talaba sub'ektining atributlari, baholash logikasi va ma'lumotlar validatsiyasi.</li>
+            <li><code>src/storage.py</code> — Xotiradagi ob'ektlarni diskdagi JSON fayliga yozish (Serialization) va o'qish (Deserialization).</li>
+            <li><code>src/manager.py</code> — Barcha talabalar to'plamini boshqarish, saralash, qidirish va guruh statistikasini tahlil qilish.</li>
+            <li><code>src/main.py</code> — Foydalanuvchi uchun qulay menyu, xatolardan himoyalangan konsol kiritish/chiqarish (I/O).</li>
+            <li><code>src/data/students.json</code> — Dastur o'chirilganda ham ma'lumotlar saqlanib qoladigan doimiy ma'lumotlar bazasi.</li>
+        </ul>
+    </div>
+
+    <!-- ==================== SAHIFA 2: DATA MODEL VA STORAGE ==================== -->
+    <div class="page-break"></div>
+
+    <h2>4. Ma'lumotlar Modeli: models.py (OOP va Validatsiya)</h2>
+    <p>
+        Tizim markazida <code>Student</code> sinfi turadi. U talabaning shaxsiy ma'lumotlarini o'zida birlashtiradi va ma'lumotlar yaxlitligini (Data Integrity) qat'iy tekshiradi.
+    </p>
+
+    <div class="grid-2">
+        <div class="card card-accent">
+            <strong>Talaba Atributlari va Tiplari:</strong>
+            <ul style="margin-top: 3px; font-size: 7.7pt;">
+                <li><code>student_id: int</code> — Unikal ketma-ket raqam</li>
+                <li><code>full_name: str</code> — To'liq ism (Titlecase)</li>
+                <li><code>email: str</code> — Unikal elektron pochta</li>
+                <li><code>grades: list[float]</code> — Imtihon ballari (0-100)</li>
+                <li><code>enrolled_date: str</code> — Sana (YYYY-MM-DD)</li>
+            </ul>
+        </div>
+        <div class="card card-emerald">
+            <strong>Validatsiya Qoidalari (_validate):</strong>
+            <ul style="margin-top: 3px; font-size: 7.7pt;">
+                <li>Ism bo'sh bo'lmasligi va kamida 3 belgi</li>
+                <li>Email ichida <code>@</code> va <code>.</code> mavjudligi</li>
+                <li>Har bir baho <code>0 &lt;= baho &lt;= 100</code></li>
+                <li>Buzilsa <code>ValueError</code> chiqariladi</li>
+            </ul>
+        </div>
+    </div>
+
+    <pre><code><span class="code-keyword">class</span> <span class="code-func">Student</span>:
+    <span class="code-keyword">def</span> <span class="code-func">__init__</span>(self, student_id: int, full_name: str, email: str, grades: list = <span class="code-keyword">None</span>):
+        self.student_id = student_id
+        self.full_name = full_name.strip().title()
+        self.email = email.strip().lower()
+        self.grades = grades <span class="code-keyword">if</span> grades <span class="code-keyword">is not None else</span> []
+        self._validate()
+
+    <span class="code-keyword">def</span> <span class="code-func">average_grade</span>(self) -> float:
+        <span class="code-keyword">if not</span> self.grades: <span class="code-keyword">return</span> <span class="code-num">0.0</span>
+        <span class="code-keyword">return</span> round(sum(self.grades) / len(self.grades), <span class="code-num">2</span>)
+
+    <span class="code-keyword">def</span> <span class="code-func">academic_status</span>(self) -> str:
+        avg = self.average_grade()
+        <span class="code-keyword">if not</span> self.grades: <span class="code-keyword">return</span> <span class="code-string">"Baholanmagan"</span>
+        <span class="code-keyword">elif</span> avg >= <span class="code-num">86.0</span>: <span class="code-keyword">return</span> <span class="code-string">"A'lochi (Honors) 🌟"</span>
+        <span class="code-keyword">elif</span> avg >= <span class="code-num">71.0</span>: <span class="code-keyword">return</span> <span class="code-string">"Yaxshi (Good) 👍"</span>
+        <span class="code-keyword">elif</span> avg >= <span class="code-num">55.0</span>: <span class="code-keyword">return</span> <span class="code-string">"Qoniqarli (Passing) ⚠️"</span>
+        <span class="code-keyword">else</span>: <span class="code-keyword">return</span> <span class="code-string">"Qarzdor (Failing) ❌"</span></code></pre>
+
+    <h2>5. Fayl Tizimi va Doimiylik: storage.py (JSON Persistence)</h2>
+    <p>
+        Operativ xotiradagi (RAM) Python ob'ektlari dastur yopilganda o'chib ketadi. <code>StorageManager</code> ma'lumotlarni qattiq diskdagi JSON formatiga o'tkazish (Serialization) va qayta tiklash (Deserialization) xizmatini beradi.
+    </p>
+
+    <div class="card card-amber">
+        <strong>Fayl Yo'lini Xavfsiz Aniqlash (Absolute Path Resolution):</strong>
+        <p style="margin-top: 2px; font-size: 7.7pt;">
+            Dastur terminalda qayerdan ishga tushirilishidan qat'i nazar xato qilmasligi uchun:
+            <code>base_dir = os.path.dirname(os.path.abspath(__file__))</code> va <code>os.path.join(base_dir, "data", "students.json")</code> qo'llaniladi.
+        </p>
+    </div>
+
+    <pre><code><span class="code-keyword">class</span> <span class="code-func">StorageManager</span>:
+    <span class="code-keyword">def</span> <span class="code-func">load_students</span>(self) -> list[Student]:
+        <span class="code-keyword">if not</span> os.path.exists(self.file_path):
+            <span class="code-keyword">return</span> []  <span class="code-comment"># Fayl hali yo'q bo'lsa bo'sh ro'yxat qaytaradi</span>
+        <span class="code-keyword">try</span>:
+            <span class="code-keyword">with</span> open(self.file_path, mode=<span class="code-string">"r"</span>, encoding=<span class="code-string">"utf-8"</span>) <span class="code-keyword">as</span> f:
+                data = json.load(f)
+                <span class="code-keyword">return</span> [Student.from_dict(item) <span class="code-keyword">for</span> item <span class="code-keyword">in</span> data]
+        <span class="code-keyword">except</span> (json.JSONDecodeError, Exception) <span class="code-keyword">as</span> e:
+            print(<span class="code-string">f"⚠️ Ogohlantirish: JSON o'qishda xatolik: {e}"</span>)
+            <span class="code-keyword">return</span> []
+
+    <span class="code-keyword">def</span> <span class="code-func">save_students</span>(self, students: list[Student]) -> bool:
+        <span class="code-keyword">try</span>:
+            data = [s.to_dict() <span class="code-keyword">for</span> s <span class="code-keyword">in</span> students]
+            <span class="code-keyword">with</span> open(self.file_path, mode=<span class="code-string">"w"</span>, encoding=<span class="code-string">"utf-8"</span>) <span class="code-keyword">as</span> f:
+                json.dump(data, f, indent=<span class="code-num">2</span>, ensure_ascii=<span class="code-keyword">False</span>)
+            <span class="code-keyword">return</span> <span class="code-keyword">True</span>
+        <span class="code-keyword">except</span> Exception <span class="code-keyword">as</span> e:
+            <span class="code-keyword">return</span> <span class="code-keyword">False</span></code></pre>
+
+    <!-- ==================== SAHIFA 3: BUSINESS LOGIC VA CLI ==================== -->
+    <div class="page-break"></div>
+
+    <h2>6. Biznes Mantiq va Tahlil Dvigateli: manager.py</h2>
+    <p>
+        <code>StudentManager</code> sinfi servis qatlami (Service Layer) hisoblanadi. U talabalar ro'yxatini xotirada keshlaydi, CRUD amallarini bajaradi va ma'lumotlar o'zgarganda ularni avtomatik tarzda <code>StorageManager</code> orqali diskka saqlaydi.
+    </p>
+
+    <div class="grid-2">
+        <div class="card">
+            <strong>CRUD & Boshqaruv:</strong>
+            <ul style="margin-top: 3px; font-size: 7.6pt;">
+                <li><code>add_student()</code> — Dublikat emailni tekshiradi, keyingi bo'sh ID ni hisoblaydi (<code>max(id) + 1</code>).</li>
+                <li><code>search_students()</code> — Katta-kichik harfni ajratmasdan ism yoki emaildan qidiradi (Substring).</li>
+                <li><code>update_student()</code> — Ism yoki emailni qayta tekshirgan holda tahrirlaydi.</li>
+                <li><code>delete_student()</code> — Talabani ro'yxatdan o'chirib diskni yangilaydi.</li>
+            </ul>
+        </div>
+        <div class="card card-emerald">
+            <strong>Tahliliy Funksiyalar (Analytics):</strong>
+            <ul style="margin-top: 3px; font-size: 7.6pt;">
+                <li><code>get_top_students(top_n=5)</code> — Lambda ifodasi yordamida eng a'lochi talabalar reytingi.</li>
+                <li><code>get_statistics()</code> — Guruhning umumiy GPA ko'rsatkichi, eng yuqori va past baholar.</li>
+                <li><code>all() va any()</code> — Guruhda qarzdorlar borligini yoki hamma talabalar imtihondan o'tganligini aniqlash.</li>
+            </ul>
+        </div>
+    </div>
+
+    <pre><code><span class="code-keyword">def</span> <span class="code-func">get_top_students</span>(self, top_n: int = <span class="code-num">5</span>) -> list[Student]:
+    graded = [s <span class="code-keyword">for</span> s <span class="code-keyword">in</span> self.students <span class="code-keyword">if</span> s.grades]
+    <span class="code-keyword">return</span> sorted(graded, key=<span class="code-keyword">lambda</span> s: s.average_grade(), reverse=<span class="code-keyword">True</span>)[:top_n]
+
+<span class="code-keyword">def</span> <span class="code-func">get_statistics</span>(self) -> dict:
+    graded = [s <span class="code-keyword">for</span> s <span class="code-keyword">in</span> self.students <span class="code-keyword">if</span> s.grades]
+    averages = [s.average_grade() <span class="code-keyword">for</span> s <span class="code-keyword">in</span> graded]
+    <span class="code-keyword">return</span> {
+        <span class="code-string">"total_students"</span>: len(self.students),
+        <span class="code-string">"class_average"</span>: round(sum(averages) / len(averages), <span class="code-num">2</span>) <span class="code-keyword">if</span> averages <span class="code-keyword">else</span> <span class="code-num">0.0</span>,
+        <span class="code-string">"highest_avg"</span>: max(averages) <span class="code-keyword">if</span> averages <span class="code-keyword">else</span> <span class="code-num">0.0</span>,
+        <span class="code-string">"lowest_avg"</span>: min(averages) <span class="code-keyword">if</span> averages <span class="code-keyword">else</span> <span class="code-num">0.0</span>,
+        <span class="code-string">"honors_count"</span>: len([s <span class="code-keyword">for</span> s <span class="code-keyword">in</span> graded <span class="code-keyword">if</span> s.average_grade() >= <span class="code-num">86.0</span>]),
+        <span class="code-string">"has_failures"</span>: any(s.average_grade() < <span class="code-num">55.0</span> <span class="code-keyword">for</span> s <span class="code-keyword">in</span> graded),
+        <span class="code-string">"all_passing"</span>: all(s.average_grade() >= <span class="code-num">55.0</span> <span class="code-keyword">for</span> s <span class="code-keyword">in</span> graded) <span class="code-keyword">if</span> graded <span class="code-keyword">else</span> <span class="code-keyword">False</span>
+    }</code></pre>
+
+    <h2>7. Konsol Foydalanuvchi Interfeysi: main.py</h2>
+    <p>
+        <code>main.py</code> foydalanuvchi bilan muloqot qiluvchi konsol boshqaruv markazidir. U qulay menyu, chiroyli jadvallar va kiritilgan ma'lumotlar xavfsizligini ta'minlaydi.
+    </p>
+
+    <div class="card card-accent">
+        <strong>Windows UTF-8 Muammosini Hal Qilish (Crucial Fix):</strong>
+        <p style="margin-top: 2px; font-size: 7.7pt;">
+            Windows PowerShell yoki CMD standart holatda <code>cp1252</code> da ishlaydi. Konsolda emoji yoki maxsus belgilar (🌟, ❌, 👍) chiqqanda dastur <code>UnicodeEncodeError</code> bilan qulamasligi uchun skript boshida:
+            <code>if hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(encoding='utf-8')</code> buyrug'i qo'shildi.
+        </p>
+    </div>
+
+    <pre><code><span class="code-keyword">def</span> <span class="code-func">print_student_table</span>(students: list):
+    <span class="code-keyword">if not</span> students:
+        print(<span class="code-string">"\nℹ️ Hozircha tizimda talabalar mavjud emas."</span>)
+        <span class="code-keyword">return</span>
+    print(<span class="code-string">"\n"</span> + <span class="code-string">"-"</span> * <span class="code-num">75</span>)
+    print(<span class="code-string">f"{'ID':<5} | {'F.I.SH.':<22} | {'EMAIL':<22} | {'O\'RT.':<6} | {'STATUS':<15}"</span>)
+    print(<span class="code-string">"-"</span> * <span class="code-num">75</span>)
+    <span class="code-keyword">for</span> s <span class="code-keyword">in</span> students:
+        print(<span class="code-string">f"{s.student_id:<5} | {s.full_name:<22} | {s.email:<22} | {s.average_grade():<6.1f} | {s.academic_status():<15}"</span>)
+    print(<span class="code-string">"-"</span> * <span class="code-num">75</span>)</code></pre>
+
+    <!-- ==================== SAHIFA 4: INTEGRATSIYA, NATIJALAR VA XULOSA ==================== -->
+    <div class="page-break"></div>
+
+    <h2>8. Modul 01 Mavzularining Loyihadagi Xaritasi (Sintez)</h2>
+    <p>
+        Ushbu jadval 1-moduldagi barcha 11 ta nazariy va amaliy dars qanday qilib ushbu loyihaga organik ravishda tatbiq etilganini ko'rsatadi:
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 14%;">Dars Kodi</th>
+                <th style="width: 28%;">Dars Mavzusi</th>
+                <th style="width: 58%;">Loyihadagi Amaliy Qo'llanilishi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>M01-L02</strong></td>
+                <td>Variables & Data Types</td>
+                <td><code>student_id (int)</code>, <code>full_name (str)</code>, <code>grades (list[float])</code>, <code>enrolled_date (str)</code> tiplari.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L03</strong></td>
+                <td>Operators & I/O</td>
+                <td>Matnlarni tekislab formatlash (<code>f-strings</code> kengliklari), <code>input()</code> orqali ma'lumot olish.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L04</strong></td>
+                <td>Conditionals (if/elif/else)</td>
+                <td>Talabaning akademik holatini aniqlash (Honors, Passing, Failing), tasdiqlash so'rovlari.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L05</strong></td>
+                <td>Loops (for, while)</td>
+                <td>Boshqaruv menyusi uchun cheksiz <code>while True</code> sikli, talabalar va baholarni <code>for</code> bilan aylanish.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L06</strong></td>
+                <td>Functions & Scope</td>
+                <td>Modulli UI funksiyalari, parametrlarni uzatish, lambda orqali saralash kaliti.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L07</strong></td>
+                <td>List, Tuple, Set, Dict</td>
+                <td>Talabalar ro'yxati (<code>list</code>), JSON yozuvlari (<code>dict</code>), tahliliy to'plamlar.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L08</strong></td>
+                <td>Strings & Built-ins</td>
+                <td><code>.strip()</code>, <code>.title()</code>, <code>.lower()</code>, <code>sum()</code>, <code>len()</code>, <code>max()</code>, <code>min()</code>, <code>all()</code>, <code>any()</code>.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L09</strong></td>
+                <td>File Handling (JSON)</td>
+                <td><code>json.dump()</code> va <code>json.load()</code> yordamida ma'lumotlarni qattiq diskka doimiy saqlash.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L10</strong></td>
+                <td>Exception Handling</td>
+                <td><code>try/except ValueError</code>, <code>JSONDecodeError</code> va nolga bo'linish xatolarini ushlash.</td>
+            </tr>
+            <tr>
+                <td><strong>M01-L11</strong></td>
+                <td>OOP Asoslari</td>
+                <td><code>Student</code> va <code>StorageManager</code> sinflari, inkapsulyatsiya, <code>self</code>, <code>@classmethod</code>.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>9. Konsol Ishchi Natijalari (Terminal Demonstration)</h2>
+    <div class="diagram-box">=================================================================
+  🎓  TALABALARNI BOSHQARISH TIZIMI (CLI STUDENT SYSTEM)
+=================================================================
+  1. 📋 Barcha talabalarni ko'rish     5. ✏️  Talaba ma'lumotlarini yangilash
+  2. ➕ Yangi talaba qo'shish          6. 🗑️  Talabani o'chirish
+  3. 📝 Talabaga baho qo'shish         7. 🏆 Top talabalar reytingi (Top 5)
+  4. 🔍 Talabani qidirish              8. 📊 Umumiy statistika va hisobot
+                                       9. 🚪 Dasturdan chiqish
+👉 Tanlovingizni kiriting (1-9): 8
+
+=================================================================
+  📌  TIZIM STATISTIKASI & HISOBOT
+=================================================================
+📊 Jami talabalar soni:        3     | 🌟 A'lochilar soni (>=86):    1
+📝 Baholangan talabalar:       3     | 👍 O'tish ballini olganlar:    1
+📈 Guruh o'rtacha balli:       73.56 | ❌ Qarzdorlar soni (<55):      1
+🥇 Eng yuqori o'rtacha ball:   91.67 | ⚠️ Qarzdorlar mavjudmi:       Ha
+📉 Eng past o'rtacha ball:     49.0  | 🎯 Hamma imtihondan o'tdimi:  Yo'q</div>
+
+    <h2>10. Modul Xulosasi va Keyingi Bosqich</h2>
+    <div class="card card-emerald">
+        <p><strong>🎉 Modul 01: Python Fundamentals Muvaffaqiyatli Yakunlandi!</strong></p>
+        <p style="margin-top: 3px;">
+            Siz Python dasturlash tilining barcha bazaviy poydevorini o'rganib, ilk mustaqil portfolio loyihangizni to'liq ishlab chiqdingiz. Endi kompyuteringizda real ishlaydigan, xatolardan himoyalangan va toza arxitekturaga ega tizim mavjud.
+        </p>
+        <p style="margin-top: 3px;">
+            <strong>🚀 Keyingi bekat — Modul 02: Mathematics & Statistics for AI!</strong><br>
+            Kelgusi modulda biz Sun'iy intellekt va Machine Learning algoritmlarining yuragi bo'lgan Ehtimollar nazariyasi, Matritsalar, Vektorlar, Hosilalar va Gradient Descent matematikasini intuitiv va vizual tarzda o'rganishni boshlaymiz.
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

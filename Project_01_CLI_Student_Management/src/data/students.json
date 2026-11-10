@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "full_name": "Ali Valiev",
+    "email": "ali@example.com",
+    "grades": [
+      88,
+      92,
+      95
+    ],
+    "enrolled_date": "2026-10-02"
+  },
+  {
+    "id": 2,
+    "full_name": "Laylo Karimova",
+    "email": "laylo@example.com",
+    "grades": [
+      75,
+      80,
+      85
+    ],
+    "enrolled_date": "2026-10-02"
+  },
+  {
+    "id": 3,
+    "full_name": "Jasur Toshov",
+    "email": "jasur@example.com",
+    "grades": [
+      50,
+      45,
+      52
+    ],
+    "enrolled_date": "2026-10-02"
+  }
+]
